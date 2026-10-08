@@ -6,7 +6,9 @@ VLA Skill Map의 연구 방향, LeRobot v3 데이터 구조, semi-supervised lab
 
 배포 완료 후 프로젝트 사이트: https://kmh03214.github.io/vla-skillmap/
 
-주제별 10페이지: 요약, 계획 검토, 데이터 구조, 자가발전 파이프라인, 연구 트렌드, Agent 연결, 로드맵, 4주 PoC, 후속 실험, 출처·실행 자료.
+주제별 11페이지: 요약, 계획 검토, 데이터 구조, 자가발전 파이프라인, 연구 트렌드, Agent 연결, 최종 아키텍처 구성도, 로드맵, 4주 PoC, 후속 실험, 출처·실행 자료.
+
+최종 아키텍처 구성도: https://kmh03214.github.io/vla-skillmap/architecture.html
 
 `docs/downloads/`에는 제안 schema·skill contract·실험 manifest·착수 체크리스트가 있습니다.
 
