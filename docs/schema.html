@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="VLA Skill Map 연구 계획 검토: LeRobot v3, semi-supervised labeling, 데이터 엔진, Agent 연결과 PoC"><title>데이터 구조 · VLA Skill Map</title><link rel="stylesheet" href="assets/style.css"><link rel="icon" href="assets/favicon.svg" type="image/svg+xml"><script src="assets/app.js" defer></script></head>
+<body><a class="skip" href="#main">본문으로 이동</a><div class="mobile-header"><a href="index.html">VLA / Skill Map</a><button id="menu-toggle" aria-expanded="false" aria-controls="sidebar">목차</button></div>
+<div class="shell"><aside class="sidebar" id="sidebar"><a class="brand" href="index.html"><span class="brand-mark">↗</span>Skill Map</a><div class="brand-sub">VLA RESEARCH / FIELD NOTES</div><nav class="nav" aria-label="리포트 주제"><a href="index.html"><span>00</span>의사결정 요약</a><a href="review.html"><span>01</span>계획 검토</a><a href="schema.html" aria-current="page"><span>02</span>데이터 구조</a><a href="pipeline.html"><span>03</span>자가발전 파이프라인</a><a href="trends.html"><span>04</span>연구 트렌드</a><a href="runtime.html"><span>05</span>Agent 연결</a><a href="roadmap.html"><span>06</span>단계별 로드맵</a><a href="poc.html"><span>07</span>4주 feasibility PoC</a><a href="experiments.html"><span>08</span>정책·후속 실험</a><a href="sources.html"><span>09</span>출처·실행 자료</a></nav><div class="sidebar-footer">RESEARCH → DATA → ACTION<br>검토일 2026.10.09<br>제안 목표 / 실험 결과 미포함</div></aside>
+<main class="main" id="main"><div class="topbar"><span>VLA / SKILL MAP RESEARCH BRIEF</span><button id="print-button" type="button">이 페이지 인쇄</button></div><header class="hero"><span class="eyebrow">02 / 데이터 구조</span><h1>원본은 그대로.<br><em>의미는 sidecar에.</em></h1><p class="lead">LeRobot v3를 저장·재생의 기준으로 유지하고, Skill Map을 버전이 고정된 annotation 및 telemetry 계층으로 붙입니다. 아래 필드는 이 연구를 위한 제안이며 LeRobot 표준 확장이 아닙니다.</p></header><section class="section"><h2>세 종류의 ID를 분리합니다.</h2><div class="grid three"><article class="card"><span class="eyebrow">SEMANTIC</span><h3>Skill ID</h3><p><code>manipulation.grasp</code><br>Ontology에서 안정적으로 유지하는 의미. composite pick의 alias로 사용하지 않습니다.</p></article><article class="card"><span class="eyebrow">MODEL-LOCAL</span><h3>Cluster space + ID</h3><p><code>checkpoint / hook / fit hash + c17</code><br>모델·표현 공간 안에서만 유효한 evidence.</p></article><article class="card"><span class="eyebrow">TEMPORAL</span><h3>Segment UID</h3><p><code>episode UID + segment UID</code><br>원본 시간 구간의 annotation. boundary 변경과 label 변경의 revision을 분리합니다.</p></article></div></section><section class="section"><h2>권장 디렉터리: v0.1</h2><pre><code>project/
+  dataset/                      # 불변 LeRobot v3 snapshot
+    meta/info.json
+    meta/tasks.parquet          # 현재 main; 실제 revision으로 검증
+    meta/episodes/chunk-*/file-*.parquet
+    data/chunk-*/file-*.parquet
+    videos/&lt;camera&gt;/chunk-*/file-*.mp4
+  skillmap/releases/sm-001/      # 별도 sidecar release
+    manifest.json
+    ontology.json
+    segments.parquet
+    annotations.parquet
+    inference_calls.parquet
+    activations.parquet
+    events.parquet
+    cluster_lineage.parquet
+    splits.json
+    selection.json</code></pre><p>v3는 여러 episode를 shared Parquet·MP4에 넣습니다. 파일명을 episode ID로 쓰지 말고 metadata의 episode 경계와 video offset을 통해 원본을 찾아야 합니다. <a class="cite" href="https://huggingface.co/docs/lerobot/lerobot-dataset-v3" target="_blank" rel="noopener">LeRobot v3 공식 문서 ↗</a></p></section><section class="section"><h2>정렬·join 계약</h2><div class="table-wrap"><table><thead><tr><th>테이블</th><th>key / 주요 field</th><th>검증 규칙</th></tr></thead><tbody><tr><td>episode registry</td><td>dataset_uid, episode_uid, episode_index, session_id, source offsets</td><td>index는 snapshot 내부 값. merge·reorder 후 새 mapping 기록</td></tr><tr><td>segments</td><td>episode_uid, track_id, level, [start_frame,end_frame_exclusive)</td><td>0 ≤ start &lt; end ≤ episode length; 같은 track/level은 겹침 정책 명시</td></tr><tr><td>annotations</td><td>segment_uid, boundary_revision, annotation_revision, skill distribution, reviewer</td><td>append-only; label release별 한 active revision. rejected·superseded 이력 보존</td></tr><tr><td>inference_calls</td><td>call_uid, observation frame, cutoff time, action start, horizon, policy hash</td><td>관측 시점과 action 실행 시점을 구분. timestamp nearest-join만 사용하지 않음</td></tr><tr><td>activations</td><td>call_uid, module_id, layer, diffusion step, cluster space, top-k, tail mass</td><td>router 모듈·denoise 단계·pooling 방법 고정. 모든 router를 하나로 평균하지 않음</td></tr><tr><td>events / outcomes</td><td>event_uid, skill_call_uid, evidence refs, status, detector version</td><td>종료 원인과 성공 판정은 별도. missing contact를 false로 간주하지 않음</td></tr><tr><td>cluster_lineage</td><td>old space/id, new space/id, relation, anchor overlap, evidence</td><td>split·merge·new·retired 관계. ontology ID는 영향을 받지 않음</td></tr></tbody></table></div></section><aside class="note "><strong>Top-k의 확률 질량</strong><p>Top-k probs 합이 1보다 작을 수 있습니다. tail_mass와 원래 posterior entropy를 저장하세요. Top-k를 재정규화해서 구한 entropy를 전체 posterior uncertainty와 섞지 않습니다.</p></aside><section class="section"><h2>Segment 예시와 실제 학습 연결</h2><details class="expandable"><summary>Segment JSON 예시 펼치기</summary><pre><code>{
+  &quot;schema_version&quot;: &quot;0.1.0&quot;,
+  &quot;dataset_uid&quot;: &quot;lab-tabletop@immutable-rev&quot;,
+  &quot;episode_uid&quot;: &quot;session-a/episode-0042&quot;,
+  &quot;episode_index&quot;: 42,
+  &quot;segment_uid&quot;: &quot;seg-0042-03&quot;,
+  &quot;boundary_revision&quot;: 1,
+  &quot;track_id&quot;: &quot;arm-right&quot;,
+  &quot;level&quot;: &quot;atomic&quot;,
+  &quot;start_frame&quot;: 318,
+  &quot;end_frame_exclusive&quot;: 391,
+  &quot;time_basis&quot;: &quot;episode_local&quot;,
+  &quot;fps&quot;: 30,
+  &quot;start_time_s&quot;: 10.6,
+  &quot;end_time_exclusive_s&quot;: 13.033333,
+  &quot;skill_id&quot;: &quot;manipulation.grasp&quot;,
+  &quot;arguments&quot;: {
+    &quot;object_id&quot;: &quot;cup-01&quot;
+  },
+  &quot;label_status&quot;: &quot;human_verified&quot;,
+  &quot;annotation_revision&quot;: &quot;ann-001&quot;,
+  &quot;cluster_space_id&quot;: &quot;stellar@checkpoint-sha/hook-v1/hdp-hash&quot;,
+  &quot;label_distribution&quot;: {
+    &quot;manipulation.grasp&quot;: 0.93,
+    &quot;unknown&quot;: 0.07
+  },
+  &quot;outcome&quot;: {
+    &quot;status&quot;: &quot;unknown&quot;,
+    &quot;termination_reason&quot;: &quot;segment_end&quot;,
+    &quot;verifier_version&quot;: &quot;grasp-v1&quot;,
+    &quot;evidence_ref&quot;: &quot;events/ev-42-03&quot;
+  },
+  &quot;parent_segment_uid&quot;: &quot;seg-0042-acquire&quot;,
+  &quot;annotation_evidence_scope&quot;: &quot;offline_full_clip&quot;,
+  &quot;provenance&quot;: {
+    &quot;ontology_version&quot;: &quot;ontology-0.1&quot;,
+    &quot;labeler_model&quot;: &quot;pinned-model&quot;,
+    &quot;prompt_hash&quot;: &quot;sha256-placeholder&quot;,
+    &quot;reviewer_id&quot;: &quot;reviewer-01&quot;
+  }
+}</code></pre></details><p>부모 composite와 atomic track을 함께 저장하되, 학습에서 사용할 level은 하나의 config로 고정합니다. 두 팔이 다른 skill을 수행하면 track을 나누고 sync relation을 둡니다. <code>unknown</code>은 라벨 상태와 별도의 semantic class로 취급합니다.</p><div class="flow"><div class="flow-node"><span>01</span><strong>원본 sample</strong><small>dataset index → episode UID / frame index</small></div><div class="flow-node"><span>02</span><strong>sidecar lookup</strong><small>해당 track·level의 half-open segment join</small></div><div class="flow-node"><span>03</span><strong>label adapter</strong><small>skill target / loss mask / source weight</small></div><div class="flow-node"><span>04</span><strong>policy batch</strong><small>기존 observation·action + 선택적 skill target</small></div></div><p>PoC에서는 Python Dataset wrapper로 join합니다. 검증 후 자주 쓰는 skill_index만 materialize한 새 dataset revision을 만들 수 있습니다. custom field는 feature schema·dtype·shape와 training processor 호환성을 확인해야 합니다.</p></section><section class="section"><h2>원문에서 빠진 누수 방지 계약</h2><div class="table-wrap"><table><thead><tr><th>구분</th><th>허용 정보</th><th>규칙</th></tr></thead><tbody><tr><td>Offline annotation</td><td>segment 앞뒤 clip, 실제 action, 결과</td><td>미래 정보 사용 가능. annotation_evidence_scope를 기록</td></tr><tr><td>Online skill predictor</td><td>현재까지의 observation/state/history</td><td>cutoff 이후 video·action·outcome 입력 금지</td></tr><tr><td>Planner-selected skill</td><td>목표·현재 state·contract</td><td>실행할 의도. 관측된 skill label과 구분해 로그</td></tr><tr><td>Evaluation oracle</td><td>gold skill 또는 미래 boundary</td><td>상한 실험으로만 보고. deployable baseline으로 취급 금지</td></tr></tbody></table></div></section><aside class="note "><strong>Action chunk 경계</strong><p>chunk가 여러 skill을 가로지르면 조건은 시작 시점의 skill 또는 시간축 skill schedule 중 하나로 명세합니다. schedule을 미래 gold에서 받으면 oracle입니다. baseline과 chunk 길이·sampling·mask·손실 대상 action 수를 맞추세요.</p></aside><nav class="pager" aria-label="이전과 다음 주제"><a href="review.html">← 계획 검토</a><a href="pipeline.html">자가발전 파이프라인 →</a></nav><footer class="footer"><span>VLA Skill Map · Research to execution</span><span>03 / 10 · 2026.10.09</span></footer></main></div></body></html>

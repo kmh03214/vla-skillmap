@@ -1,0 +1,41 @@
+{
+  "schema_version": "0.1.0",
+  "dataset_uid": "lab-tabletop@immutable-rev",
+  "episode_uid": "session-a/episode-0042",
+  "episode_index": 42,
+  "segment_uid": "seg-0042-03",
+  "boundary_revision": 1,
+  "track_id": "arm-right",
+  "level": "atomic",
+  "start_frame": 318,
+  "end_frame_exclusive": 391,
+  "time_basis": "episode_local",
+  "fps": 30,
+  "start_time_s": 10.6,
+  "end_time_exclusive_s": 13.033333,
+  "skill_id": "manipulation.grasp",
+  "arguments": {
+    "object_id": "cup-01"
+  },
+  "label_status": "human_verified",
+  "annotation_revision": "ann-001",
+  "cluster_space_id": "stellar@checkpoint-sha/hook-v1/hdp-hash",
+  "label_distribution": {
+    "manipulation.grasp": 0.93,
+    "unknown": 0.07
+  },
+  "outcome": {
+    "status": "unknown",
+    "termination_reason": "segment_end",
+    "verifier_version": "grasp-v1",
+    "evidence_ref": "events/ev-42-03"
+  },
+  "parent_segment_uid": "seg-0042-acquire",
+  "annotation_evidence_scope": "offline_full_clip",
+  "provenance": {
+    "ontology_version": "ontology-0.1",
+    "labeler_model": "pinned-model",
+    "prompt_hash": "sha256-placeholder",
+    "reviewer_id": "reviewer-01"
+  }
+}

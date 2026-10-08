@@ -1,0 +1,28 @@
+{
+  "skill_map_schema": "0.1.0",
+  "dataset_format": "lerobot_v3",
+  "base_dataset": {
+    "repo_id": "lab/robot-dataset",
+    "revision": "PIN_IMMUTABLE_REVISION",
+    "dataset_uid": "lab-tabletop@immutable-rev"
+  },
+  "lerobot_commit": "PIN_INSTALLED_COMMIT",
+  "ontology_version": "ontology-0.1",
+  "annotation_release": "ann-001",
+  "frame_key": [
+    "dataset_uid",
+    "episode_uid",
+    "frame_index"
+  ],
+  "frame_interval": "[start_frame,end_frame_exclusive)",
+  "time_basis": "episode_local",
+  "telemetry_sampling": "inference-call",
+  "raw_dataset_mutation": false,
+  "training_snapshot": {
+    "selection_manifest": "selection.json",
+    "split_manifest": "splits.json",
+    "pseudo_weight": 0.5,
+    "unknown_semantic_loss_masked": true
+  },
+  "cluster_spaces": []
+}

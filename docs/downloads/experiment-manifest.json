@@ -1,0 +1,34 @@
+{
+  "experiment_id": "poc-r2-v0.1",
+  "hypothesis": "latent evidence improves quality or reduces review time vs kinematics+VLM",
+  "primary_metric": "person_minutes_at_matched_macro_f1",
+  "split_manifest": "splits.json",
+  "locked_test": true,
+  "label_budgets_person_minutes": [
+    60,
+    120,
+    240
+  ],
+  "shared_seed_cost_reported": true,
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "arms": [
+    "R0-manual-random",
+    "R1-kin-vlm-random",
+    "R2-latent-active"
+  ],
+  "controls": [
+    "same_episode_pool",
+    "same_ui",
+    "same_teacher_version",
+    "same_gold",
+    "same_compute_log"
+  ],
+  "online_conditioning": "past_only_predicted_skill_or_planner_selected_skill",
+  "oracle_reported_separately": true,
+  "statistics": "episode-grouped bootstrap CI; paired initial states for rollout",
+  "stopping": "pre_registered_gates; no test-based threshold tuning"
+}

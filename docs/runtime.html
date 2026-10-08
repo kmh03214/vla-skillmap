@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="VLA Skill Map 연구 계획 검토: LeRobot v3, semi-supervised labeling, 데이터 엔진, Agent 연결과 PoC"><title>Agent 연결 · VLA Skill Map</title><link rel="stylesheet" href="assets/style.css"><link rel="icon" href="assets/favicon.svg" type="image/svg+xml"><script src="assets/app.js" defer></script></head>
+<body><a class="skip" href="#main">본문으로 이동</a><div class="mobile-header"><a href="index.html">VLA / Skill Map</a><button id="menu-toggle" aria-expanded="false" aria-controls="sidebar">목차</button></div>
+<div class="shell"><aside class="sidebar" id="sidebar"><a class="brand" href="index.html"><span class="brand-mark">↗</span>Skill Map</a><div class="brand-sub">VLA RESEARCH / FIELD NOTES</div><nav class="nav" aria-label="리포트 주제"><a href="index.html"><span>00</span>의사결정 요약</a><a href="review.html"><span>01</span>계획 검토</a><a href="schema.html"><span>02</span>데이터 구조</a><a href="pipeline.html"><span>03</span>자가발전 파이프라인</a><a href="trends.html"><span>04</span>연구 트렌드</a><a href="runtime.html" aria-current="page"><span>05</span>Agent 연결</a><a href="roadmap.html"><span>06</span>단계별 로드맵</a><a href="poc.html"><span>07</span>4주 feasibility PoC</a><a href="experiments.html"><span>08</span>정책·후속 실험</a><a href="sources.html"><span>09</span>출처·실행 자료</a></nav><div class="sidebar-footer">RESEARCH → DATA → ACTION<br>검토일 2026.10.09<br>제안 목표 / 실험 결과 미포함</div></aside>
+<main class="main" id="main"><div class="topbar"><span>VLA / SKILL MAP RESEARCH BRIEF</span><button id="print-button" type="button">이 페이지 인쇄</button></div><header class="hero"><span class="eyebrow">05 / Agent 연결</span><h1>Agent가 선택하고,<br><em>로봇이 증명합니다.</em></h1><p class="lead">처음에는 skill library 전체를 구현할 필요가 없습니다. 반복적으로 성공 가능한 2–3개 composite skill과 고정 planner부터 시작해, 학습된 VLM planner의 추가 효과를 비교합니다.</p></header><section class="section"><h2>느린 reasoning과 빠른 실행의 경계</h2><div class="runtime-stack"><div><span>VLM / AGENT</span><strong>목표·대상·계획·예외 처리</strong><small>skill 경계·실패·사용자 지시 변경 때 호출</small></div><div><span>SKILL SUPERVISOR</span><strong>가용성·precondition·timeout·검증</strong><small>상태 버전과 관측 freshness 검사</small></div><div><span>VLA / LOCAL EXECUTOR</span><strong>관측 → action chunk</strong><small>executor scope·action 단위·control mode 고정</small></div><div><span>CONTROLLER / SAFETY</span><strong>독립 제한·watchdog·중단</strong><small>planner 응답에 의존하지 않는 local loop</small></div></div><p>주기는 플랫폼 측정 후 설정합니다. 임의의 30 Hz나 1초를 요구사항으로 고정하지 않습니다. P95/P99 inference latency, action age, deadline miss, planner 대기 시간을 분리해서 기록합니다.</p></section><section class="section"><h2>호출 예시: skill ID는 의미, executor는 구현</h2><div class="grid two"><article class="card"><h3>Proposal</h3><pre><code>{
+  &quot;skill_id&quot;: &quot;manipulation.acquire_object&quot;,
+  &quot;contract_version&quot;: &quot;0.1.0&quot;,
+  &quot;object_id&quot;: &quot;cup-01&quot;,
+  &quot;grounding&quot;: {
+    &quot;camera&quot;: &quot;front&quot;,
+    &quot;bbox_xyxy_normalized&quot;: [
+      0.31,
+      0.22,
+      0.52,
+      0.61
+    ],
+    &quot;observation_timestamp_s&quot;: 10.6
+  },
+  &quot;executor_revision&quot;: &quot;PIN_POLICY_SHA&quot;,
+  &quot;request_id&quot;: &quot;call-042-03&quot;,
+  &quot;constraints&quot;: {
+    &quot;timeout_s&quot;: 6,
+    &quot;retry_budget&quot;: 1
+  }
+}</code></pre></article><article class="card"><h3>Verified result</h3><pre><code>{
+  &quot;request_id&quot;: &quot;call-042-03&quot;,
+  &quot;status&quot;: &quot;failure&quot;,
+  &quot;termination_reason&quot;: &quot;timeout&quot;,
+  &quot;postcondition&quot;: {
+    &quot;name&quot;: &quot;object_held_and_clear_of_surface&quot;,
+    &quot;value&quot;: &quot;false&quot;,
+    &quot;verifier_version&quot;: &quot;v1&quot;
+  },
+  &quot;failure_category&quot;: &quot;missed_grasp&quot;,
+  &quot;recovery_candidate&quot;: &quot;relocalize_then_regrasp&quot;,
+  &quot;trace_ref&quot;: &quot;episode-0042/call-03&quot;
+}</code></pre></article></div><p>Bounding box에는 camera·좌표 규약·관측 시간을 붙입니다. 오래된 target grounding은 갱신해야 합니다. Planner가 보낸 임의 safety limit을 그대로 사용하지 말고 로컬 contract에 설정된 허용 범위 안에서 요청을 검증합니다.</p></section><section class="section"><h2>종료와 성공은 서로 다릅니다.</h2><div class="table-wrap"><table><thead><tr><th>관측 / 상태</th><th>판정</th><th>다음 행동</th></tr></thead><tbody><tr><td>gripper close</td><td>실행 event; 성공의 충분조건 아님</td><td>object와 EE의 동반 이동 / contact / visual hold를 확인</td></tr><tr><td>postcondition 만족</td><td>success</td><td>다음 skill의 precondition 검사</td></tr><tr><td>timeout, postcondition false</td><td>failure</td><td>scope 내 재시도 또는 recovery</td></tr><tr><td>occlusion으로 postcondition 불명확</td><td>unknown</td><td>추가 관측 / 재검증; 자동 성공 선언 금지</td></tr><tr><td>safety stop 또는 취소</td><td>aborted / safety_stop</td><td>action queue 취소·controlled stop·필요한 개입</td></tr></tbody></table></div></section><section class="section"><h2>첫 agent 실험: 비교 가능한 3개 구조</h2><div class="table-wrap"><table><thead><tr><th>구조</th><th>목적</th><th>통제</th></tr></thead><tbody><tr><td>고정 sequence / state machine + VLA</td><td>wrapper와 verifier의 효과 측정</td><td>동일 executor·동일 targets·같은 retry budget</td></tr><tr><td>VLM planner + VLA, verifier 없음</td><td>계획의 이득과 unchecked 실패 측정</td><td>동일 초기 상태·계산비용 기록</td></tr><tr><td>VLM planner + contract + verifier</td><td>닫힌 실행 loop의 추가 효과 측정</td><td>recovery와 retries를 포함한 총 시간·성공률</td></tr></tbody></table></div></section><aside class="note "><strong>학습되지 않은 호출 범위를 검증</strong><p>기존 VLA가 전체 trajectory에만 학습됐다면 임의 atomic phase에서 재시작을 잘한다고 가정할 수 없습니다. acquire/place 같이 시작 상태가 검증된 composite부터 expose하고, staging state·skill transition·중간 재시작을 별도 평가합니다.</p></aside><section class="section"><h2>학습 데이터와 runtime를 함께 성장시키는 방법</h2><p>동일 stable skill ID 아래에 여러 execution realization을 둡니다. 예를 들어 <code>acquire_object@robot-A</code>와 <code>acquire_object@robot-B</code>는 다른 checkpoint·action schema·calibration·valid scope를 가집니다. 상위 agent는 의미와 조건을 검색하고 supervisor가 실제 executor를 선택합니다.</p><details class="expandable"><summary>Skill contract YAML 펼치기</summary><pre><code>skill_id: manipulation.acquire_object
+contract_version: 0.1.0
+semantic_level: composite
+children: [approach, grasp, lift]
+arguments:
+  object_id: required
+  target_pose_frame: robot_base
+preconditions: [target_grounded, reachable, gripper_empty]
+termination: [postcondition_satisfied, timeout, abort, safety_stop]
+postcondition: object_held_and_clear_of_surface
+executor:
+  policy_checkpoint: PIN_CHECKPOINT_SHA
+  embodiment: PIN_ROBOT_CONFIG
+  calibration_id: PIN_CALIBRATION
+  supported_start_states: PIN_VALIDATED_SCOPE
+  action_schema: PIN_FRAME_UNITS_JOINT_ORDER
+  max_duration_s: SET_FROM_MEASUREMENTS
+  retry_budget: 1
+verification:
+  model_version: PIN_VERIFIER
+  result: [success, failure, unknown]
+fallback: controlled_stop_then_human_review
+release_status: candidate</code></pre></details></section><nav class="pager" aria-label="이전과 다음 주제"><a href="trends.html">← 연구 트렌드</a><a href="roadmap.html">단계별 로드맵 →</a></nav><footer class="footer"><span>VLA Skill Map · Research to execution</span><span>06 / 10 · 2026.10.09</span></footer></main></div></body></html>

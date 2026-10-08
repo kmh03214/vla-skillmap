@@ -1,0 +1,23 @@
+skill_id: manipulation.acquire_object
+contract_version: 0.1.0
+semantic_level: composite
+children: [approach, grasp, lift]
+arguments:
+  object_id: required
+  target_pose_frame: robot_base
+preconditions: [target_grounded, reachable, gripper_empty]
+termination: [postcondition_satisfied, timeout, abort, safety_stop]
+postcondition: object_held_and_clear_of_surface
+executor:
+  policy_checkpoint: PIN_CHECKPOINT_SHA
+  embodiment: PIN_ROBOT_CONFIG
+  calibration_id: PIN_CALIBRATION
+  supported_start_states: PIN_VALIDATED_SCOPE
+  action_schema: PIN_FRAME_UNITS_JOINT_ORDER
+  max_duration_s: SET_FROM_MEASUREMENTS
+  retry_budget: 1
+verification:
+  model_version: PIN_VERIFIER
+  result: [success, failure, unknown]
+fallback: controlled_stop_then_human_review
+release_status: candidate

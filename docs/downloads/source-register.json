@@ -1,0 +1,170 @@
+[
+  {
+    "id": "pi07",
+    "title": "π0.7",
+    "date": "2026-04-16 · v2",
+    "url": "https://arxiv.org/abs/2604.15483",
+    "scope": "언어 명령에 performance metadata·subgoal image 등 다양한 context conditioning을 더한 통합형 generalist. 사용자 환경 재현은 미실시."
+  },
+  {
+    "id": "er2",
+    "title": "Gemini Robotics ER 2",
+    "date": "2026-07-30",
+    "url": "https://deepmind.google/models/gemini-robotics/embodied-reasoning/",
+    "scope": "상위 embodied reasoning과 low-level VLA 실행을 연결하는 공식 제품 설명. model card와 함께 확인."
+  },
+  {
+    "id": "er2card",
+    "title": "Gemini Robotics ER 2 model card",
+    "date": "2026-07-30",
+    "url": "https://deepmind.google/models/model-cards/gemini-robotics-er-2/",
+    "scope": "Text·image·video 등을 입력받고 text를 출력하는 VLM. action controller와 구분."
+  },
+  {
+    "id": "saycan",
+    "title": "SayCan",
+    "date": "2022",
+    "url": "https://say-can.github.io/",
+    "scope": "언어적 유용성과 실행 affordance를 함께 고려하는 skill 선택의 초기 계보."
+  },
+  {
+    "id": "hirobot",
+    "title": "Hi Robot",
+    "date": "2025-02",
+    "url": "https://arxiv.org/abs/2502.19417",
+    "scope": "상위 VLM의 open-ended instruction following을 하위 VLA의 subtask execution과 연결."
+  },
+  {
+    "id": "pi05",
+    "title": "π0.5",
+    "date": "2025-04",
+    "url": "https://arxiv.org/abs/2504.16054",
+    "scope": "다양한 robot·web supervision과 semantic subtask를 연결하는 generalist 학습."
+  },
+  {
+    "id": "recap",
+    "title": "π*0.6 / RECAP",
+    "date": "2025-11",
+    "url": "https://arxiv.org/abs/2511.14759",
+    "scope": "자율 수집·expert correction·demonstration을 advantage conditioning 기반 개선에 사용."
+  },
+  {
+    "id": "mem",
+    "title": "MEM",
+    "date": "2026-03",
+    "url": "https://arxiv.org/abs/2603.03596",
+    "scope": "단기 video와 장기 language memory를 결합. Skill 실행 history와 현재 관측을 함께 다룰 근거."
+  },
+  {
+    "id": "moe",
+    "title": "Emergent Compositional Skills in MoE VLAs",
+    "date": "2026-07 · v2",
+    "url": "https://arxiv.org/html/2607.20771v2",
+    "scope": "expert specialization과 reusable structure를 연구하되 expert–semantic primitive 대응의 한계를 명시."
+  },
+  {
+    "id": "stellar",
+    "title": "Stellar VLA",
+    "date": "2025-11 · v4 2026-05-08",
+    "url": "https://arxiv.org/html/2511.18085v4",
+    "scope": "지속 모방학습의 latent knowledge space와 MoE routing. semantic label의 정답성을 증명하는 논문은 아니다. 최신 개정판을 기준으로 확인."
+  },
+  {
+    "id": "lavla",
+    "title": "LAVLA",
+    "date": "2026-09-02",
+    "url": "https://arxiv.org/html/2609.02634v1",
+    "scope": "GR00T N1.5 layer별 cluster 분석과 VLM concept naming. interpretability 결과와 policy 성능 향상을 구분한다."
+  },
+  {
+    "id": "atomic",
+    "title": "AtomicVLA",
+    "date": "2026-03",
+    "url": "https://arxiv.org/html/2603.07648v1",
+    "scope": "운동학적 분해와 video model refinement, skill 기반 학습을 연결하는 직접 비교 대상."
+  },
+  {
+    "id": "harness",
+    "title": "Harness VLA",
+    "date": "2026-07 · v5 09-24",
+    "url": "https://arxiv.org/abs/2607.08448",
+    "scope": "Frozen VLA를 contact-rich primitive로 감싸고 memory와 agent가 grounding·recovery를 담당한다."
+  },
+  {
+    "id": "embodied",
+    "title": "EmbodiedSkills",
+    "date": "2026-09-01",
+    "url": "https://arxiv.org/abs/2609.01281",
+    "scope": "Precondition → bounded execution → verification을 공통 interface로 연결한다."
+  },
+  {
+    "id": "uniskill",
+    "title": "Uni-Skill",
+    "date": "2026-03-03",
+    "url": "https://arxiv.org/abs/2603.02623",
+    "scope": "계층 skill repository와 demonstration retrieval을 통한 확장. 논문 페이지에 ICRA 2026 채택 표기."
+  },
+  {
+    "id": "hivla",
+    "title": "HiVLA",
+    "date": "2026-04 · v2 05-10",
+    "url": "https://arxiv.org/abs/2604.14125",
+    "scope": "Subtask instruction과 bounding box로 상위 VLM과 low-level action expert를 연결한다."
+  },
+  {
+    "id": "goal2",
+    "title": "Goal2Skill",
+    "date": "2026-04",
+    "url": "https://arxiv.org/abs/2604.13942",
+    "scope": "계획·reflection·재계획을 long-horizon execution과 연결하는 계층적 접근."
+  },
+  {
+    "id": "vista",
+    "title": "VISTA",
+    "date": "2026-02",
+    "url": "https://arxiv.org/abs/2602.10983",
+    "scope": "World model의 visual subgoal을 계층 manipulation policy의 interface로 사용한다."
+  },
+  {
+    "id": "survey",
+    "title": "Agent Skills Survey",
+    "date": "2026-05 · v3",
+    "url": "https://arxiv.org/abs/2605.07358",
+    "scope": "Representation·acquisition·retrieval·evolution 생명주기. 로봇 표준 스키마로 그대로 간주하지 않는다."
+  },
+  {
+    "id": "lerobot-doc",
+    "title": "LeRobot v3 공식 문서",
+    "date": "2026-10-09 확인",
+    "url": "https://huggingface.co/docs/lerobot/lerobot-dataset-v3",
+    "scope": "다중 episode shard와 metadata 기반 episode 재구성. tasks 경로 설명은 현재 코드와 불일치한다."
+  },
+  {
+    "id": "lerobot-code",
+    "title": "LeRobot main / utils.py",
+    "date": "2026-10-09 확인",
+    "url": "https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/utils.py",
+    "scope": "DEFAULT_TASKS_PATH=meta/tasks.parquet, LEGACY_TASKS_PATH=meta/tasks.jsonl. 실제 사용 release/commit을 고정해야 한다."
+  },
+  {
+    "id": "lerobot-loader",
+    "title": "LeRobot main / dataset loader",
+    "date": "2026-10-09 확인",
+    "url": "https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/lerobot_dataset.py",
+    "scope": "조회한 파일에서는 subtask 문자열이 확인되지 않음. native subtask 지원을 전제로 설계하지 않는다."
+  },
+  {
+    "id": "libero",
+    "title": "LIBERO",
+    "date": "2023",
+    "url": "https://arxiv.org/abs/2306.03310",
+    "scope": "지식 전이와 lifelong manipulation 평가. 단기 단일 task 및 중기 forgetting 실험에 사용."
+  },
+  {
+    "id": "calvin",
+    "title": "CALVIN",
+    "date": "2021",
+    "url": "https://arxiv.org/abs/2112.03227",
+    "scope": "Language-conditioned long-horizon skill composition. 중장기 sequence 평가용."
+  }
+]
